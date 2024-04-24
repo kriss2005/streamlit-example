@@ -4,11 +4,9 @@ import pandas as pd
 import streamlit as st
 
 """
-# Welcome to Streamlit!
+# Streamlit trial App
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+
 
 
 """
@@ -25,7 +23,7 @@ import altair as alt
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("apl_aq_sample.csv")
+    df = pd.read_csv("/Users/krabraham/Documents/streamlit_trial/apl_aq_sample.csv")
     return df
 
 df = load_data()
@@ -51,16 +49,23 @@ selected_direction = st.selectbox('Select Direction', ['All'] + list(filtered_df
 if selected_direction != 'All':
     filtered_df = filtered_df[filtered_df['direction'] == selected_direction]
 
+
 # Checkbox filters
 selected_sensor_name = st.selectbox('Select Sensor', ['All'] + list(filtered_df['name'].unique()))
 
 if selected_sensor_name != 'All':
     filtered_df = filtered_df[filtered_df['name'] == selected_sensor_name]
 
+# Checkbox filters
+view_deed_goal = st.selectbox('Display Deed Goal', ['No', 'Yes'])
+
+if selected_direction != 'All':
+    filtered_df = filtered_df[filtered_df['direction'] == selected_direction]
+
 if selected_metric == 'VIS':
     avg_df = filtered_df.groupby(['time', 'name', 'direction'])['value'].mean().reset_index()
     # Create line chart
-    st.write("### VIS Line Chart")
+    st.write("### Tunnel Sensor Values for Visibility (K) Sensors")
     line_chart = alt.Chart(avg_df).mark_line().encode(
         x='time',
         y='value',
@@ -69,15 +74,27 @@ if selected_metric == 'VIS':
         width=800,
         height=400
     )
-    st.altair_chart(line_chart, use_container_width=True)
+    
 
+    limit_chart = alt.Chart(avg_df).mark_line(strokeWidth=3).encode(
+        x='time',
+        y='deed_goal',
+          # 'N' indicates a nominal (categorical) variable
+    ).properties(
+        width=800,
+        height=400
+    )
+    if view_deed_goal == 'Yes':
+        st.altair_chart(line_chart + limit_chart, use_container_width=True)
+    else:
+        st.altair_chart(line_chart, use_container_width=True)
 else:
 
     avg_df = filtered_df.groupby(['time', 'direction', 'deed_goal'])['value'].mean().reset_index()
 
 
     # Create line chart
-    st.write("### Line Chart")
+    st.write(f"### Tunnel Average for {selected_metric} Sensors")
     line_chart = alt.Chart(avg_df).mark_line().encode(
         x='time',
         y= 'value',
@@ -96,4 +113,8 @@ else:
         width=800,
         height=400
     )
-    st.altair_chart(line_chart + limit_chart, use_container_width=True)
+
+    if view_deed_goal == 'Yes':
+        st.altair_chart(line_chart + limit_chart, use_container_width=True)
+    else:
+        st.altair_chart(line_chart, use_container_width=True)
