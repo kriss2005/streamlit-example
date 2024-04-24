@@ -63,7 +63,7 @@ if selected_direction != 'All':
     filtered_df = filtered_df[filtered_df['direction'] == selected_direction]
 
 if selected_metric == 'VIS':
-    avg_df = filtered_df.groupby(['time', 'name', 'direction'])['value'].mean().reset_index()
+    avg_df = filtered_df.groupby(['time', 'name', 'direction', 'deed_goal'])['value'].mean().reset_index()
     # Create line chart
     st.write("### Tunnel Sensor Values for Visibility (K) Sensors")
     line_chart = alt.Chart(avg_df).mark_line().encode(
