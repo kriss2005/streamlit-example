@@ -23,7 +23,7 @@ import altair as alt
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("/Users/krabraham/Documents/streamlit_trial/apl_aq_sample.csv")
+    df = pd.read_csv("apl_aq_sample.csv")
     return df
 
 df = load_data()
